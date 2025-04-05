@@ -1,11 +1,6 @@
 <template>
   <div class="message">
-    <img v-if="!!message.image" :src="message.image" alt="User message" />
     <div class="text">
-      <div class="reply" v-if="!!message.replying">
-        <p class="title">Олежа Стилист</p>
-        <p>{{ message.replying.text }}</p>
-      </div>
       <p>{{ message.text }}</p>
     </div>
   </div>

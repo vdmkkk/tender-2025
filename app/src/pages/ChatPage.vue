@@ -2,27 +2,24 @@
   <q-page class="column app">
     <q-drawer :model-value="true">
       <q-list style="margin-top: 50px">
-        <q-item v-for="chat in chats" clickable v-ripple>
+        <q-item v-for="chat in chats" clickable v-ripple @click="handleSelectChat(chat.userId)">
           <q-item-section>
             <q-item-label>{{ chat.username }}</q-item-label>
-            <q-item-label caption>{{ chat.text }}</q-item-label>
+            <q-item-label caption>{{ chat.lastMsg }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
     <div class="messages">
       <div v-for="message in messages" v-bind:key="message.text">
-        <UserMessageComponent v-if="message.fromUser" :message="message" />
+        <UserMessageComponent v-if="message.fromUser != 'user'" :message="message" />
         <div v-else>
           <BotMessageComponent :message="message" />
-          <q-btn style="margin-top: 20px" flat round dense @click="handleReply(message)">
-            <img style="width: 20px; height: 20px" :src="replyIcon" />
-          </q-btn>
         </div>
       </div>
       <div v-if="loading">
         <q-spinner-dots size="50px" color="grey-5" />
-        <p style="color: #a9a9a9">(загрузка ответа может занимать несколько минут)</p>
+        <p style="color: #a9a9a9">Ищем ответ на ваш вопрос...</p>
       </div>
     </div>
     <div class="input">
@@ -64,7 +61,7 @@ import UserMessageComponent from 'src/components/UserMessageComponent.vue';
 import { BotMessage, Icons, UserMessage } from 'src/types/Message';
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import arrowUpIcon from 'src/assets/icons/arrow_up.svg';
-import { useQuasar } from 'quasar';
+import { Cookies, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
 
 const $q = useQuasar();
@@ -74,17 +71,13 @@ const inputText = ref<string>('');
 const loading = ref<boolean>(false);
 const messages = ref<(UserMessage | BotMessage)[]>([]);
 
-const chats = [
-  { username: 'vdmkkk', text: 'Привет!', waiting: false },
-  { username: 'vdmkkk', text: 'Привет!', waiting: false },
-  { username: 'vdmkkk', text: 'Привет!', waiting: false },
-  { username: 'vdmkkk', text: 'Привет!', waiting: false },
-  { username: 'vdmkkk', text: 'Привет!', waiting: false },
-];
+const selectedUserId = ref(null);
 
-function randomIntFromInterval(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
+const chats = ref([]);
+
+const handleSelectChat = (id) => {
+  selectedUserId.value = id;
+};
 
 const handlerSend = () => {
   if (!inputText.value) {
@@ -92,15 +85,19 @@ const handlerSend = () => {
   }
   messages.value.push({
     text: inputText.value,
-    image: base64Image.value,
     fromUser: true,
   });
   const prompt = inputText.value;
   inputText.value = '';
   loading.value = true;
+  console.log(selectedUserId.value);
   api
-    .post('https://kq6xvehj73vs3j-5556.proxy.runpod.net/process_pipeline', {
-      prompt,
+    .post('http://109.73.206.70:8004/message', {
+      sender_type: 'admin',
+      user_id: selectedUserId.value,
+      content: {
+        text: prompt,
+      },
     })
     .then((response) => {
       //
@@ -110,25 +107,38 @@ const handlerSend = () => {
     });
 };
 
-const handleReply = (message: BotMessage) => {
-  replyingTo.value = message;
-};
-
-const clearReply = () => {
-  replyingTo.value = null;
-};
-
 const isDark = computed(() => $q.dark.isActive);
 
+watch(selectedUserId, () => {
+  api
+    .get(`http://109.73.206.70:8004/chat?offset=${0}&limit=${9999}&user_id=${Cookies.get('id')}`)
+    .then((res) => {
+      messages.value = res.data.map((res) => {
+        return {
+          id: res.id,
+          text: res.content.text,
+          fromUser: res.sender_type,
+        };
+      });
+    });
+});
+
 onMounted(() => {
-  const savedMessages = localStorage.getItem('messages');
-  if (savedMessages) {
-    try {
-      messages.value = JSON.parse(savedMessages);
-    } catch (error) {
-      console.error('Error parsing saved messages:', error);
-    }
-  }
+  api
+    .get(`http://109.73.206.70:8004/admin/chat?offset=${0}&limit=${9999}&user_id=${9999}`)
+    .then((res) => {
+      chats.value = Object.entries(res.data)
+        .map(([id, chat]) => {
+          if (chat.message) {
+            return {
+              username: chat.username,
+              lastMsg: chat.message.content.text,
+              userId: chat.message.user_id,
+            };
+          }
+        })
+        .filter((chat) => chat);
+    });
 });
 </script>
 

@@ -1,48 +1,44 @@
 <template>
   <div class="message">
-    <p class="title">{{ message.text }}</p>
-    <img
-      v-if="!!message.image"
-      :src="'data:image/png;base64,' + message.image"
-      alt="User message"
-    />
-    <p class="title">Список вещей:</p>
-    <div class="column" style="gap: 24px; margin-top: 20px">
-      <ItemComponent v-for="item in message.items" v-bind:key="item.name" :item="item" />
+    <div class="text">
+      <p>{{ message.text }}</p>
     </div>
-    <div class="separator" />
-    <div class="row price">
-      <q-icon name="shopping_cart" />
-      <p>
-        {{
-          message.items.reduce((accumulator, currentValue) => accumulator + currentValue.price, 0) +
-          ' '
-        }}
-        руб.
-      </p>
-    </div>
-    <div class="separator" />
-    <p class="title">
-      Надеюсь, эти варианты помогут тебе собрать желаемый образ. Обрати внимание на размеры и
-      наличие товаров перед заказом.
-    </p>
   </div>
 </template>
 
 <script setup lang="ts">
 // @ts-nocheck //
 /* eslint-disable */
-import { BotMessage } from 'src/types/Message';
-import ItemComponent from './ItemComponent.vue';
+import { UserMessage } from 'src/types/Message';
 
-const {} = defineProps<{ message: BotMessage }>();
+const {} = defineProps<{ message: UserMessage }>();
 </script>
 
 <style lang="scss" scoped>
+@media screen and (max-width: 572px) {
+  .message {
+    .text {
+      width: 80% !important;
+    }
+
+    img {
+      max-width: 280px !important;
+    }
+  }
+}
 .body--dark {
   .message {
-    .separator {
-      background-color: #414141;
+    .text {
+      background-color: #333;
+      p {
+        color: #fff;
+      }
+    }
+
+    .reply {
+      background-color: #242424 !important;
+      color: white;
+      border-left: 3px solid #414141 !important;
     }
   }
 }
@@ -51,40 +47,20 @@ const {} = defineProps<{ message: BotMessage }>();
   display: flex;
   flex-direction: column;
   align-items: start;
+  margin-top: 20px;
 
-  .title {
-    font-size: 16px;
-    line-height: 24px;
-    margin-top: 20px;
-    margin-bottom: 0px;
-  }
-
-  .separator {
-    width: 100%;
-    height: 1px;
-    background-color: #deeaed;
-    margin-top: 24px;
-    margin-bottom: 24px;
-  }
-
-  img {
-    max-width: 300px;
-    max-height: 400px;
-    object-fit: contain;
-    border-radius: 12px;
-    margin-top: 20px;
-  }
-
-  .price {
-    align-items: center;
-
-    gap: 8px;
+  .text {
+    width: 40%;
+    background-color: white;
+    padding: 16px 24px;
+    border-top-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-top-right-radius: 15px;
 
     p {
       margin: 0;
       font-size: 16px;
       line-height: 24px;
-      font-weight: 600;
     }
   }
 }

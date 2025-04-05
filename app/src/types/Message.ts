@@ -1,9 +1,7 @@
 export type UserMessage = {
-  //   id: number;
+  id: number;
   text: string;
-  image?: string;
-  fromUser: true;
-  replying?: UserMessage;
+  fromUser: 'user';
 };
 
 export type GoodType = {
@@ -17,11 +15,10 @@ export type GoodType = {
 };
 
 export type BotMessage = {
-  //   id: number;
+  id: number;
   text: string;
-  image?: string;
   items: GoodType[];
-  fromUser: false;
+  fromUser: 'bot' | 'admin';
 };
 
 export enum Icons {
