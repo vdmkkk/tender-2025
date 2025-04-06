@@ -35,8 +35,8 @@ const handleSubmit = () => {
   api
     .post('http://109.73.206.70:8004/register', { username: login.value, password: password.value })
     .then((res) => {
-      Cookies.set('id', res.data.id);
-      Cookies.set('username', res.data.username);
+      Cookies.set('id', res.data.id, { path: '/' });
+      Cookies.set('username', res.data.username, { path: '/' });
       window.location.href = '/';
     })
     .catch((res) => {
