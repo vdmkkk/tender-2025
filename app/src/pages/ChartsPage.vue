@@ -1,23 +1,24 @@
 <template>
   <q-dialog v-model="dialogOpen"
     ><div class="dialog">
-      <UserMessageComponent
-        v-for="(message, index) in messages"
-        :key="index"
-        :message="message"
-        :left="false"
-      />
-      <div class="column" style="align-items: end; margin-top: 10px" v-if="message?.feedBackRating">
-        <div class="row">
-          <img
-            v-for="star in maxRating"
-            :key="star"
-            :src="star <= message.feedBackRating ? star_icon : unfilled_star"
-            alt="star"
-            class="star"
-          />
+      <div v-for="(message, index) in messages" :key="index">
+        <UserMessageComponent :key="index" :message="message" :left="false" />
+        <div
+          class="column"
+          style="align-items: end; margin-top: 10px; margin-right: 20vw"
+          v-if="message?.feedBackRating"
+        >
+          <div class="row">
+            <img
+              v-for="star in maxRating"
+              :key="star"
+              :src="star <= message.feedBackRating ? star_icon : unfilled_star"
+              alt="star"
+              class="star"
+            />
+          </div>
+          <p style="margin-top: 10px; color: #a9a9a9">{{ message.feedBackText }}</p>
         </div>
-        <p style="margin-top: 10px; color: #a9a9a9">{{ message.feedBackText }}</p>
       </div>
     </div></q-dialog
   >
@@ -37,6 +38,8 @@ import { api } from 'src/boot/axios';
 import UserMessageComponent from 'src/components/UserMessageComponent.vue';
 import star_icon from 'src/assets/icons/star.svg';
 import unfilled_star from 'src/assets/icons/star_unfilled.svg';
+
+const maxRating = 5;
 
 const $q = useQuasar();
 const classes = ref();
@@ -104,6 +107,7 @@ const generateOptions = () => {
                       feedBackRating: res.feedback_rating,
                     };
                   });
+                  console.log(messages.value);
                 });
             },
           },
