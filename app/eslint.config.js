@@ -33,7 +33,7 @@ export default defineConfigWithVueTs(
    * pluginVue.configs["flat/recommended"]
    *   -> Above, plus rules to enforce subjective community defaults to ensure consistency.
    */
-  pluginVue.configs[ 'flat/essential' ],
+  pluginVue.configs['flat/essential'],
 
   {
     files: ['**/*.ts', '**/*.vue'],
@@ -41,6 +41,12 @@ export default defineConfigWithVueTs(
       '@typescript-eslint/consistent-type-imports': [
         'error',
         { prefer: 'type-imports' }
+      ],
+      '@typescript-eslint/ban-ts-comment': [
+        'warn', // or 'off' to disable warnings/errors
+        {
+          'ts-nocheck': false, // Allow the use of @ts-nocheck
+        },
       ],
     }
   },
@@ -69,12 +75,12 @@ export default defineConfigWithVueTs(
       'prefer-promise-reject-errors': 'off',
 
       // allow debugger during development only
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     }
   },
 
   {
-    files: [ 'src-pwa/custom-service-worker.ts' ],
+    files: ['src-pwa/custom-service-worker.ts'],
     languageOptions: {
       globals: {
         ...globals.serviceworker
