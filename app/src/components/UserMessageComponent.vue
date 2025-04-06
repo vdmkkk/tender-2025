@@ -12,7 +12,7 @@
         />
       </div>
     </div>
-    <div class="text" v-if="message.parse_web">
+    <div class="text" v-else-if="message.parse_web">
       <div v-for="(link, i) in message.parse_web" :key="i">
         <p v-if="!link.text.includes('No info')" class="link" @click="handleRedirect(link.url)">
           · {{ link.text }}
@@ -55,7 +55,7 @@ const compiledMarkdown = computed(() => {
           ? message.button.button
           : message.response?.output
             ? message.response.output
-            : message.text,
+            : (message.text ?? '123'),
   );
 });
 
