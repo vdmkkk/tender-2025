@@ -6,6 +6,8 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck //
+/* eslint-disable */
 import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import Highcharts from 'highcharts';

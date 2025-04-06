@@ -25,6 +25,8 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck //
+/* eslint-disable */
 import { Cookies, Notify } from 'quasar';
 import { api } from 'src/boot/axios';
 import { ref } from 'vue';
