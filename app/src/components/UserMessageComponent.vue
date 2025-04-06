@@ -1,7 +1,7 @@
 <template>
   <div class="message" :style="left ? { alignItems: 'start' } : { alignItems: 'end' }">
     <div v-if="message.flag == 2" class="btns">
-      <div v-for="btn in message.response">
+      <div v-for="(btn, i) in message.response" :key="i">
         <q-btn
           :label="btn.button"
           unelevated
@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="text" v-if="message.parse_web">
-      <div v-for="link in message.parse_web">
+      <div v-for="(link, i) in message.parse_web" :key="i">
         <p v-if="!link.text.includes('No info')" class="link" @click="handleRedirect(link.url)">
           · {{ link.text }}
         </p>

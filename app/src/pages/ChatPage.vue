@@ -3,7 +3,8 @@
     <q-drawer :model-value="true">
       <q-list style="margin-top: 50px; border-top: 1px #ddd solid">
         <q-item
-          v-for="chat in chats"
+          v-for="(chat, i) in chats"
+          :key="i"
           clickable
           v-ripple
           @click="handleSelectChat(chat.userId)"

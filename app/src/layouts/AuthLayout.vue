@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { Cookies } from 'quasar';
-import { onMounted, watch } from 'vue';
+import { onMounted } from 'vue';
 
 // @ts-nocheck //
 /* eslint-disable */

@@ -62,7 +62,7 @@
     </div>
     <div v-else class="input">
       <div v-if="hints.length > 0" class="hints">
-        <p v-for="hint in hints" @click="handleHint(hint)">{{ hint }}</p>
+        <p v-for="(hint, i) in hints" :key="i" @click="handleHint(hint)">{{ hint }}</p>
       </div>
       <q-input
         v-model="inputText"
@@ -199,6 +199,9 @@ const handleButtonClick = (button) => {
     fromUser: 'user',
     button,
   });
+  if (loading.value) {
+    return;
+  }
   hints.value = [];
   loading.value = true;
   isFinal.value = false;
