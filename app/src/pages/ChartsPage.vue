@@ -6,8 +6,21 @@
         :key="index"
         :message="message"
         :left="false"
-      /></div
-  ></q-dialog>
+      />
+      <div class="column" style="align-items: end; margin-top: 10px" v-if="message?.feedBackRating">
+        <div class="row">
+          <img
+            v-for="star in maxRating"
+            :key="star"
+            :src="star <= message.feedBackRating ? star_icon : unfilled_star"
+            alt="star"
+            class="star"
+          />
+        </div>
+        <p style="margin-top: 10px; color: #a9a9a9">{{ message.feedBackText }}</p>
+      </div>
+    </div></q-dialog
+  >
   <div class="chart" id="container1" />
   <div class="chart" id="container2" />
   <!-- <div class="chart" id="container3" />
@@ -22,6 +35,8 @@ import { useQuasar } from 'quasar';
 import Highcharts from 'highcharts';
 import { api } from 'src/boot/axios';
 import UserMessageComponent from 'src/components/UserMessageComponent.vue';
+import star_icon from 'src/assets/icons/star.svg';
+import unfilled_star from 'src/assets/icons/star_unfilled.svg';
 
 const $q = useQuasar();
 const classes = ref();
@@ -85,6 +100,8 @@ const generateOptions = () => {
                       id: res.id,
                       fromUser: res.sender_type,
                       ...res.content,
+                      feedBackText: res.feedback_description,
+                      feedBackRating: res.feedback_rating,
                     };
                   });
                 });
@@ -195,5 +212,10 @@ onMounted(() => {
   .message {
     margin-right: 20vw;
   }
+}
+
+.star {
+  width: 20px;
+  height: 20px;
 }
 </style>
