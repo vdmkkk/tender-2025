@@ -12,7 +12,7 @@
         >
           <q-item-section>
             <q-item-label>{{ chat.username }}</q-item-label>
-            <q-item-label caption
+            <q-item-label caption class="last-msg"
               >{{ chat.fromUser == 'admin' ? 'Оператор: ' : chat.fromUser == 'bot' ? 'Бот: ' : ''
               }}{{ chat.lastMsg }}</q-item-label
             >
@@ -141,7 +141,7 @@ const isDark = computed(() => $q.dark.isActive);
 
 watch(selectedUserId, () => {
   api
-    .get(`http://109.73.206.70:8004/chat?offset=${0}&limit=${9999}&user_id=${Cookies.get('id')}`)
+    .get(`http://109.73.206.70:8004/chat?offset=${0}&limit=${9999}&user_id=${selectedUserId.value}`)
     .then((res) => {
       messages.value = res.data
         .map((res) => {
@@ -174,7 +174,17 @@ onMounted(() => {
           if (chat.message) {
             return {
               username: chat.username,
-              lastMsg: chat.message.content.text,
+              // lastMsg: chat.message.content.text,
+              lastMsg:
+                chat.message.content.flag == 1 || chat.message.content.flag == 0
+                  ? chat.message.content.response
+                  : chat.message.content.web
+                    ? chat.message.content.web
+                    : chat.message.content.button
+                      ? chat.message.content.button.button
+                      : chat.message.content.response?.output
+                        ? chat.message.content.response.output
+                        : (chat.message.content.text ?? 'Кнопки'),
               userId: chat.message.user_id,
               fromUser: chat.message.sender_type,
               needAdmin: chat.need_admin,
@@ -402,5 +412,13 @@ onMounted(() => {
 .star {
   width: 20px;
   height: 20px;
+}
+
+.last-msg {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* number of lines to show */
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 </style>
