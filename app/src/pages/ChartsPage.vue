@@ -1,4 +1,13 @@
 <template>
+  <q-dialog v-model="dialogOpen"
+    ><div class="dialog">
+      <UserMessageComponent
+        v-for="(message, index) in messages"
+        :key="index"
+        :message="message"
+        :left="false"
+      /></div
+  ></q-dialog>
   <div class="chart" id="container1" />
   <div class="chart" id="container2" />
   <!-- <div class="chart" id="container3" />
@@ -12,10 +21,14 @@ import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import Highcharts from 'highcharts';
 import { api } from 'src/boot/axios';
+import UserMessageComponent from 'src/components/UserMessageComponent.vue';
 
 const $q = useQuasar();
 const classes = ref();
 const classes2 = ref();
+
+const dialogOpen = ref(false);
+const messages = ref([]);
 
 const generateOptions = () => {
   // const seriesClicks = clientNames.map((client) => {
@@ -52,7 +65,34 @@ const generateOptions = () => {
     ],
     credits: { enabled: false },
     legend: { layout: 'vertical', align: 'right', verticalAlign: 'middle' },
-    plotOptions: { series: { label: { connectorAllowed: false } } },
+    plotOptions: {
+      series: {
+        label: { connectorAllowed: false },
+        cursor: 'pointer',
+        point: {
+          events: {
+            click: function () {
+              // Capture the category name and any other point property
+              dialogOpen.value = true;
+              api
+                .get(
+                  `http://109.73.206.70:8004/messages-by-class?class_varvara=${this.category == 'Нет' ? null : this.category}&offset=${0}&limit=${9999}`,
+                )
+                .then((response) => {
+                  // classes.value = response.data;
+                  messages.value = response.data.map((res) => {
+                    return {
+                      id: res.id,
+                      fromUser: res.sender_type,
+                      ...res.content,
+                    };
+                  });
+                });
+            },
+          },
+        },
+      },
+    },
   });
   Highcharts.chart('container2', {
     chart: { type: 'column' },
@@ -73,7 +113,33 @@ const generateOptions = () => {
     ],
     credits: { enabled: false },
     legend: { layout: 'vertical', align: 'right', verticalAlign: 'middle' },
-    plotOptions: { series: { label: { connectorAllowed: false } } },
+    plotOptions: {
+      series: {
+        label: { connectorAllowed: false },
+        cursor: 'pointer',
+        point: {
+          events: {
+            click: function () {
+              dialogOpen.value = true;
+              api
+                .get(
+                  `http://109.73.206.70:8004/messages-by-class?class_varvara=${this.category == 'Нет' ? null : this.category}&offset=${0}&limit=${9999}`,
+                )
+                .then((response) => {
+                  // classes.value = response.data;
+                  messages.value = response.data.map((res) => {
+                    return {
+                      id: res.id,
+                      fromUser: res.sender_type,
+                      ...res.content,
+                    };
+                  });
+                });
+            },
+          },
+        },
+      },
+    },
   });
   // Highcharts.chart('container2', {
   //   title: { text: 'Cost Per Date (Filtered by Client)' },
@@ -116,3 +182,18 @@ onMounted(() => {
   });
 });
 </script>
+
+<style lang="scss" scoped>
+.dialog {
+  background-color: $primary;
+  display: flex;
+  flex-direction: column;
+  min-width: 80vw !important;
+  height: 90vh;
+  align-items: end !important;
+
+  .message {
+    margin-right: 20vw;
+  }
+}
+</style>

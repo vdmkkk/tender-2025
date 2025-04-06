@@ -160,6 +160,8 @@ const handleHint = (hint) => {
   inputText.value = '';
   hints.value = [];
   isFinal.value = false;
+  rating.value = 0;
+  feedback.value = '';
   api
     .post('http://109.73.206.70:8004/message', {
       sender_type: 'user',
@@ -205,6 +207,8 @@ const handleButtonClick = (button) => {
   hints.value = [];
   loading.value = true;
   isFinal.value = false;
+  rating.value = 0;
+  feedback.value = '';
   api
     .post('http://109.73.206.70:8004/message', {
       sender_type: 'user',
@@ -252,6 +256,8 @@ const handlerSend = () => {
   loading.value = true;
   hints.value = [];
   isFinal.value = false;
+  rating.value = 0;
+  feedback.value = '';
   api
     .post('http://109.73.206.70:8004/message', {
       sender_type: 'user',
@@ -297,6 +303,8 @@ const handleInternet = (ans) => {
   hints.value = [];
   loading.value = true;
   isFinal.value = false;
+  rating.value = 0;
+  feedback.value = '';
   api
     .post('http://109.73.206.70:8004/message', {
       sender_type: 'user',
@@ -605,8 +613,8 @@ const handleCallAssistant = () => {
 
   .star {
     cursor: pointer;
-    width: 64px;
-    height: 64px;
+    width: 44px;
+    height: 44px;
     padding-right: 4px;
     padding-left: 4px;
   }
