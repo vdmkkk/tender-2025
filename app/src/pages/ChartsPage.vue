@@ -15,6 +15,7 @@ import { api } from 'src/boot/axios';
 
 const $q = useQuasar();
 const classes = ref();
+const classes2 = ref();
 
 const generateOptions = () => {
   // const seriesClicks = clientNames.map((client) => {
@@ -34,20 +35,43 @@ const generateOptions = () => {
   console.log(classes.value);
   Highcharts.chart('container1', {
     chart: { type: 'column' },
-    title: { text: 'Clicks Per Date (Filtered by Client)' },
+    title: { text: 'Частотность категорий' },
     xAxis: {
       categories: classes.value.map((res) => {
-        return res.class_varvara;
+        return res.class_varvara ?? 'Нет';
       }),
-      title: { text: 'Date' },
     },
     yAxis: { title: { text: 'Кол-во запросов' } },
-    series: {
-      name: 'client',
-      data: classes.value.map((res) => {
-        return res.count;
+    series: [
+      {
+        name: 'Категории',
+        data: classes.value.map((res) => {
+          return res.count;
+        }),
+      },
+    ],
+    credits: { enabled: false },
+    legend: { layout: 'vertical', align: 'right', verticalAlign: 'middle' },
+    plotOptions: { series: { label: { connectorAllowed: false } } },
+  });
+  Highcharts.chart('container2', {
+    chart: { type: 'column' },
+    title: { text: 'Средний рейтинг категорий' },
+    xAxis: {
+      categories: classes2.value.map((res) => {
+        return res.class_varvara ?? 'Нет';
       }),
     },
+    yAxis: { title: { text: 'Средний рейтинг категорий' } },
+    series: [
+      {
+        name: 'Категории',
+        data: classes2.value.map((res) => {
+          return res.avg_rating ?? 0;
+        }),
+      },
+    ],
+    credits: { enabled: false },
     legend: { layout: 'vertical', align: 'right', verticalAlign: 'middle' },
     plotOptions: { series: { label: { connectorAllowed: false } } },
   });
@@ -78,10 +102,16 @@ const generateOptions = () => {
 };
 
 onMounted(() => {
-  generateOptions();
-  api.get('http://109.73.206.70:8004/count').then((response) => {
+  // generateOptions();
+  const first = api.get('http://109.73.206.70:8004/count').then((response) => {
     classes.value = response.data;
     // console.log(csvData.value);
+  });
+  const second = api.get('http://109.73.206.70:8004/avg').then((response) => {
+    classes2.value = response.data;
+    // console.log(csvData.value);
+  });
+  Promise.all([first, second]).then(() => {
     generateOptions();
   });
 });
