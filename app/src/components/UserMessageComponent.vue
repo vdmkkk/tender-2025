@@ -11,6 +11,14 @@
           @click="handleBtnClick(btn)"
         />
       </div>
+      <q-btn
+        label="Другое"
+        unelevated
+        no-caps
+        rounded
+        color="accent"
+        @click="handleBtnClick({ button: 'Другое', question: 'Другое' })"
+      />
     </div>
     <div class="text" v-else-if="message.parse_web">
       <div v-for="(link, i) in message.parse_web" :key="i">

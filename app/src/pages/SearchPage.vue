@@ -609,7 +609,7 @@ const handleCallAssistant = () => {
 .feedback {
   display: flex;
   flex-direction: column;
-  margin-top: 170px;
+  margin-top: 70px;
 
   .star {
     cursor: pointer;
