@@ -1,20 +1,46 @@
 <template>
   <q-page class="column app">
     <q-drawer :model-value="true">
-      <q-list style="margin-top: 50px">
-        <q-item v-for="chat in chats" clickable v-ripple @click="handleSelectChat(chat.userId)">
+      <q-list style="margin-top: 50px; border-top: 1px #ddd solid">
+        <q-item
+          v-for="chat in chats"
+          clickable
+          v-ripple
+          @click="handleSelectChat(chat.userId)"
+          style="border-bottom: 1px #ddd solid"
+        >
           <q-item-section>
             <q-item-label>{{ chat.username }}</q-item-label>
-            <q-item-label caption>{{ chat.lastMsg }}</q-item-label>
+            <q-item-label caption
+              >{{ chat.fromUser == 'admin' ? 'Оператор: ' : chat.fromUser == 'bot' ? 'Бот: ' : ''
+              }}{{ chat.lastMsg }}</q-item-label
+            >
           </q-item-section>
+          <div class="red" v-if="chat.needAdmin" />
         </q-item>
       </q-list>
     </q-drawer>
-    <div class="messages">
+    <div v-if="!selectedUserId" class="no-chat">
+      <p>Выберите чат</p>
+    </div>
+    <div v-else class="messages">
       <div v-for="message in messages" v-bind:key="message.text">
-        <UserMessageComponent v-if="message.fromUser != 'user'" :message="message" />
-        <div v-else>
-          <BotMessageComponent :message="message" />
+        <UserMessageComponent :left="message.fromUser == 'user'" :message="message" />
+        <div
+          class="column"
+          style="align-items: end; margin-top: 10px"
+          v-if="message.feedBackRating"
+        >
+          <div class="row">
+            <img
+              v-for="star in maxRating"
+              :key="star"
+              :src="star <= message.feedBackRating ? star_icon : unfilled_star"
+              alt="star"
+              class="star"
+            />
+          </div>
+          <p style="margin-top: 10px; color: #a9a9a9">{{ message.feedBackText }}</p>
         </div>
       </div>
       <div v-if="loading">
@@ -56,13 +82,14 @@
 <script setup lang="ts">
 // @ts-nocheck //
 /* eslint-disable */
-import BotMessageComponent from 'src/components/BotMessageComponent.vue';
 import UserMessageComponent from 'src/components/UserMessageComponent.vue';
 import { BotMessage, Icons, UserMessage } from 'src/types/Message';
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import arrowUpIcon from 'src/assets/icons/arrow_up.svg';
 import { Cookies, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
+import star_icon from 'src/assets/icons/star.svg';
+import unfilled_star from 'src/assets/icons/star_unfilled.svg';
 
 const $q = useQuasar();
 
@@ -75,6 +102,8 @@ const selectedUserId = ref(null);
 
 const chats = ref([]);
 
+const maxRating = 5;
+
 const handleSelectChat = (id) => {
   selectedUserId.value = id;
 };
@@ -85,7 +114,7 @@ const handlerSend = () => {
   }
   messages.value.push({
     text: inputText.value,
-    fromUser: true,
+    fromUser: 'admin',
   });
   const prompt = inputText.value;
   inputText.value = '';
@@ -113,13 +142,25 @@ watch(selectedUserId, () => {
   api
     .get(`http://109.73.206.70:8004/chat?offset=${0}&limit=${9999}&user_id=${Cookies.get('id')}`)
     .then((res) => {
-      messages.value = res.data.map((res) => {
-        return {
-          id: res.id,
-          text: res.content.text,
-          fromUser: res.sender_type,
-        };
-      });
+      messages.value = res.data
+        .map((res) => {
+          return {
+            id: res.id,
+            fromUser: res.sender_type,
+            ...res.content,
+            feedBackText: res.feedback_description,
+            feedBackRating: res.feedback_rating,
+          };
+        })
+        .reverse();
+      setTimeout(() => {
+        const messagesContainer = document.querySelector('.messages');
+        // scroll to the bottom of the messages container and offset it for 200 px
+        messagesContainer?.children[messagesContainer?.children.length - 1].scrollIntoView({
+          behavior: 'smooth',
+        });
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 0);
     });
 });
 
@@ -134,6 +175,8 @@ onMounted(() => {
               username: chat.username,
               lastMsg: chat.message.content.text,
               userId: chat.message.user_id,
+              fromUser: chat.message.sender_type,
+              needAdmin: chat.need_admin,
             };
           }
         })
@@ -254,7 +297,7 @@ onMounted(() => {
   width: 700px;
   position: fixed;
   bottom: 20px;
-  left: 50%;
+  left: calc(50% + 150px);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -334,5 +377,29 @@ onMounted(() => {
 .slide-fade-leave-to {
   transform: translateX(40px);
   opacity: 0;
+}
+
+.no-chat {
+  p {
+    font-size: 20px;
+    margin-top: 40vh;
+    transform: translateY(-50%);
+    text-align: center;
+  }
+}
+
+.red {
+  background-color: red;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+.star {
+  width: 20px;
+  height: 20px;
 }
 </style>

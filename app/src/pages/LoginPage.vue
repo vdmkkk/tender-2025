@@ -6,6 +6,7 @@
       v-model="password"
       rounded
       flat
+      type="password"
       placeholder="Пароль"
       class="q-input"
       color="transparent"

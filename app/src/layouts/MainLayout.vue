@@ -3,6 +3,13 @@
     <q-header class="header">
       <img :src="isDark ? logo_dark : logo" />
 
+      <div class="row menu">
+        <p @click="handleRedirect('/search')">Чат</p>
+        <p @click="handleRedirect('/admin')">Оператор</p>
+        <p @click="handleRedirect('/stats')">Аналитика</p>
+        <p @click="handleRedirect('/files')">База знаний</p>
+      </div>
+
       <div class="row no-wrap" style="gap: 10px">
         <q-btn
           flat
@@ -47,6 +54,10 @@ const handleLogout = () => {
   window.location.href = '/auth';
 };
 
+const handleRedirect = (path) => {
+  window.location.href = path;
+};
+
 const isDark = computed(() => $q.dark.isActive);
 
 function toggleDark() {
@@ -68,6 +79,14 @@ onMounted(() => {
   padding-left: 7vw;
   padding-right: 7vw;
   align-items: center;
+
+  .menu {
+    gap: 20px;
+    p {
+      margin: 0;
+      cursor: pointer;
+    }
+  }
 
   .new-chat {
     color: #ffffff;

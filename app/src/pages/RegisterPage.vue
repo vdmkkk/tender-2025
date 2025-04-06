@@ -5,6 +5,7 @@
     <q-input
       v-model="password"
       rounded
+      type="password"
       flat
       placeholder="Пароль"
       class="q-input"
